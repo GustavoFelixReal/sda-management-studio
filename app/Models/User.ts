@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon'
+import Hash from '@ioc:Adonis/Core/Hash'
 import {
   beforeSave,
   BelongsTo,
@@ -7,10 +7,11 @@ import {
   HasMany,
   hasMany
 } from '@ioc:Adonis/Lucid/Orm'
-import Hash from '@ioc:Adonis/Core/Hash'
+import { DateTime } from 'luxon'
 
 import AppBaseModel from './AppBaseModel'
 import Church from './Church'
+import Event from './Event'
 import Schedule from './Schedule'
 import ScheduleItem from './ScheduleItem'
 
@@ -35,6 +36,9 @@ export default class User extends AppBaseModel {
 
   @column({ serializeAs: null })
   public rememberMeToken?: string
+
+  @column()
+  public isAdmin: boolean
 
   @column()
   public isBlocked: boolean
@@ -79,4 +83,14 @@ export default class User extends AppBaseModel {
     foreignKey: 'updatedBy'
   })
   public updatedScheduleItem: HasMany<typeof ScheduleItem>
+
+  @hasMany(() => Event, {
+    foreignKey: 'createdBy'
+  })
+  public createdEvent: HasMany<typeof Event>
+
+  @hasMany(() => Event, {
+    foreignKey: 'updatedBy'
+  })
+  public updatedEvent: HasMany<typeof Event>
 }
