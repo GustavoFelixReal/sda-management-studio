@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import {
   BelongsTo,
   belongsTo,
@@ -6,14 +5,15 @@ import {
   HasMany,
   hasMany
 } from '@ioc:Adonis/Lucid/Orm'
+import { DateTime } from 'luxon'
 
 import AppBaseModel from './AppBaseModel'
-import ScheduleItem from './ScheduleItem'
 import Church from './Church'
+import ScheduleItem from './ScheduleItem'
 import User from './User'
 
 export default class Schedule extends AppBaseModel {
-  protected tableName: string = 'schedules'
+  public static table: string = 'schedules'
 
   public static allStatus: string[] = [
     'PENDING',

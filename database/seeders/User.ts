@@ -1,5 +1,4 @@
 import Env from '@ioc:Adonis/Core/Env'
-import Hash from '@ioc:Adonis/Core/Hash'
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 
 import User from 'App/Models/User'
@@ -15,7 +14,7 @@ export default class UserSeeder extends BaseSeeder {
         email: Env.get('SA_EMAIL'),
         isAdmin: true,
         isBlocked: false,
-        password: await Hash.make(Env.get('SA_PASSWORD'))
+        password: Env.get('SA_PASSWORD')
       }
     ])
     // Write your database queries inside the run method

@@ -11,8 +11,9 @@ export default class EventsImages extends BaseSchema {
         .unsigned()
         .references('events.id')
         .onDelete('CASCADE')
+        .notNullable()
       table.string('description', 50)
-      table.string('src', 255)
+      table.string('src', 255).notNullable()
     })
   }
 

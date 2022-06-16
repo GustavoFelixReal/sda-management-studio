@@ -1,15 +1,21 @@
-import { DateTime } from 'luxon'
 import { column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { DateTime } from 'luxon'
 import AppBaseModel from './AppBaseModel'
-import User from './User'
 import Schedule from './Schedule'
+import User from './User'
 
 export default class Church extends AppBaseModel {
-  protected tableName: string = 'churches'
+  public static table: string = 'churches'
 
   protected static get visible() {
     return ['id', 'name', 'isBlocked', 'isDeleted', 'createdAt', 'updatedAt']
   }
+
+  public static departments: string[] = [
+    'LAR E FAMÍLIA',
+    'DESBRAVADORES',
+    'COMUNICAÇÃO'
+  ]
 
   @column({ isPrimary: true })
   public id: number

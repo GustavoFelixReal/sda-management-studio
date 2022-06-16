@@ -11,8 +11,9 @@ export default class EventsLinks extends BaseSchema {
         .unsigned()
         .references('events.id')
         .onDelete('CASCADE')
+        .notNullable()
       table.string('description', 50)
-      table.string('url', 255)
+      table.string('url', 255).notNullable()
     })
   }
 

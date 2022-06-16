@@ -6,8 +6,8 @@ import {
   findScheduleValidator
 } from 'App/Validators/Schedules'
 
-import Schedule from 'App/Models/Schedule'
 import PermissionDeniedException from 'App/Exceptions/PermissionDeniedException'
+import Schedule from 'App/Models/Schedule'
 
 export default class SchedulesController {
   public async index({ auth, response }: HttpContextContract) {

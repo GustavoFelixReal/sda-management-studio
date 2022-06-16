@@ -27,6 +27,14 @@ Route.group(() => {
   Route.post('/register', 'AuthController.register')
 })
 
+// Churches
+Route.group(() => {
+  Route.get('/churches', 'ChurchesController.index')
+  Route.post('/churches', 'ChurchesController.store')
+  Route.get('/churches/:id', 'ChurchesController.find')
+  Route.put('/churches/:id', 'ChurchesController.update')
+}).middleware('auth')
+
 // Users
 Route.group(() => {
   Route.get('/users', 'UsersController.index')
@@ -34,12 +42,11 @@ Route.group(() => {
   Route.put('/users/:id', 'UsersController.update')
 }).middleware('auth')
 
-// Churches
+// Events
 Route.group(() => {
-  Route.get('/churches', 'ChurchesController.index')
-  Route.post('/churches', 'ChurchesController.store')
-  Route.get('/churches/:id', 'ChurchesController.find')
-  Route.put('/churches/:id', 'ChurchesController.update')
+  Route.get('/events', 'EventsController.index')
+  Route.post('/events', 'EventsController.store')
+  Route.get('/events/cycle/:cycle', 'EventsController.cycleList')
 }).middleware('auth')
 
 // Schedules

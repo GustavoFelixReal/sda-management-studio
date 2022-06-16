@@ -1,11 +1,11 @@
-import { DateTime } from 'luxon'
 import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { DateTime } from 'luxon'
 import AppBaseModel from './AppBaseModel'
 import Schedule from './Schedule'
 import User from './User'
 
 export default class ScheduleItem extends AppBaseModel {
-  protected tableName: string = 'schedule_items'
+  public static table: string = 'schedule_items'
 
   @column({ isPrimary: true })
   public id: number

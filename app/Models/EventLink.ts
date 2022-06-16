@@ -3,9 +3,14 @@ import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import AppBaseModel from './AppBaseModel'
 import Event from './Event'
 
-export default class EventLinks extends AppBaseModel {
+export default class EventLink extends AppBaseModel {
+  public static table: string = 'events_links'
+
   @column({ isPrimary: true })
   public id: number
+
+  @column()
+  public eventId: number
 
   @column()
   public description: string

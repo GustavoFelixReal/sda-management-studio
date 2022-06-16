@@ -16,6 +16,8 @@ import Schedule from './Schedule'
 import ScheduleItem from './ScheduleItem'
 
 export default class User extends AppBaseModel {
+  public static table: string = 'users'
+
   @column({ isPrimary: true })
   public id: number
 

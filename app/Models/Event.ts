@@ -9,10 +9,19 @@ import { DateTime } from 'luxon'
 
 import AppBaseModel from './AppBaseModel'
 import Church from './Church'
-import EventImages from './EventImages'
-import EventLinks from './EventLinks'
+import EventImages from './EventImage'
+import EventLinks from './EventLink'
+import User from './User'
 
 export default class Event extends AppBaseModel {
+  public static allStatus: string[] = [
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'CANCELED',
+    'COMPLETED'
+  ]
+
   @column({ isPrimary: true })
   public id: number
 
@@ -50,13 +59,19 @@ export default class Event extends AppBaseModel {
   public department: string
 
   @column()
-  public isActive: boolean
+  public status: string
 
   @column()
   public cycle: string
 
+  @column()
+  public createdBy: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
+
+  @column()
+  public updatedBy: number
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
@@ -65,6 +80,16 @@ export default class Event extends AppBaseModel {
     foreignKey: 'churchId'
   })
   public organization: BelongsTo<typeof Church>
+
+  @belongsTo(() => User, {
+    foreignKey: 'createdBy'
+  })
+  public author: BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'updatedBy'
+  })
+  public maintainer: BelongsTo<typeof User>
 
   @hasMany(() => EventLinks, {
     foreignKey: 'eventId'
