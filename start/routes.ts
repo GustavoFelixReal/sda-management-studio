@@ -47,6 +47,7 @@ Route.group(() => {
   Route.get('/events', 'EventsController.index')
   Route.post('/events', 'EventsController.store')
   Route.get('/events/cycle/:cycle', 'EventsController.cycleList')
+  Route.get('/events/:id', 'EventsController.find')
 }).middleware('auth')
 
 // Schedules

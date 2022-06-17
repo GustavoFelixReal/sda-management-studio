@@ -30,3 +30,7 @@ export const createEventValidator = yup.object().shape({
 export const cycleListValidator = yup.object().shape({
   cycle: yup.string().required('validation.event_cycle_required')
 })
+
+export const findEventValidator = yup.object().shape({
+  id: yup.string().required('validation.event_id_required')
+})

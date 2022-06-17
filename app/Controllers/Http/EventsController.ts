@@ -1,8 +1,13 @@
 import Env from '@ioc:Adonis/Core/Env'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-import { createEventValidator, cycleListValidator } from 'App/Validators/Events'
+import {
+  createEventValidator,
+  cycleListValidator,
+  findEventValidator
+} from 'App/Validators/Events'
 
+import PermissionDeniedException from 'App/Exceptions/PermissionDeniedException'
 import Event from 'App/Models/Event'
 import EventImage from 'App/Models/EventImage'
 import EventLink from 'App/Models/EventLink'
@@ -89,6 +94,25 @@ export default class EventsController {
       })
 
     return response.status(200).json({ events })
+  }
+
+  public async find({ auth, request, response }: HttpContextContract) {
+    const payload = request.params()
+
+    await findEventValidator.validate(payload)
+
+    const event = await Event.query()
+      .where('id', payload.id)
+      .where('churchId', auth.user.$attributes.churchId)
+      .preload('author')
+      .preload('maintainer')
+      .first()
+
+    if (!event) {
+      throw new PermissionDeniedException('', 401, 'E_PERMISSION_DENIED')
+    }
+
+    return response.status(200).json({ event })
   }
 
   private getCycle(
