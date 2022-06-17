@@ -45,11 +45,10 @@ export default class EventsController {
         const currentWeekDay = currentDate.getDay() + 1
 
         if (currentWeekDay > Number(Env.get('EVENT_MAX_SUBMISSION_WEEK_DAY'))) {
-          const inAWeek = new Date(currentDate.getDate() + 7)
-          return this.getCycle(inAWeek).fullCycle
+          return this.getCycle(currentDate, 1).cycle
         }
 
-        return this.getCycle(currentDate).fullCycle
+        return this.getCycle(currentDate).cycle
       })(),
       createdBy: id,
       updatedBy: id
@@ -84,6 +83,7 @@ export default class EventsController {
         false
       ])
       .andWhereNotIn('status', ['CANCELED', 'REJECTED', 'COMPLETED'])
+      .andWhere('cycle', payload.cycle)
       .preload('maintainer', (query) => {
         query.select('id', 'name')
       })
@@ -91,16 +91,22 @@ export default class EventsController {
     return response.status(200).json({ events })
   }
 
-  private getCycle(date: Date): { fullCycle: string; week: number } {
+  private getCycle(
+    date: Date,
+    incrementWeek = 0
+  ): { cycle: string; currentWeek: number } {
     const startDate = new Date(date.getFullYear(), 0, 1)
 
-    const days = Math.floor(
+    const pastDays = Math.floor(
       (date.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)
     )
 
-    const week = Math.ceil(days / 7)
-    const fullCycle = `${('0' + week).slice(-2)}${date.getFullYear()}`
+    const currentWeek = Math.ceil(pastDays / 7)
 
-    return { fullCycle, week }
+    const cycle = `${('0' + (currentWeek + incrementWeek)).slice(
+      -2
+    )}${date.getFullYear()}`
+
+    return { cycle, currentWeek }
   }
 }
