@@ -4,7 +4,8 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import {
   createEventValidator,
   cycleListValidator,
-  findEventValidator
+  findEventValidator,
+  updateEventValidator
 } from 'App/Validators/Events'
 
 import PermissionDeniedException from 'App/Exceptions/PermissionDeniedException'
@@ -81,11 +82,14 @@ export default class EventsController {
 
     await cycleListValidator.validate(payload)
 
+    const { id, churchId } = auth.user.$attributes
+
     const events = await Event.query()
       .select('id', 'title', 'date', 'status', 'cycle', 'updatedBy')
-      .whereRaw('(church_id = ? OR is_internal = ?)', [
-        auth.user.$attributes.churchId,
-        false
+      .whereRaw('(church_id = ? OR (is_internal = ? AND created_by = ?))', [
+        churchId,
+        false,
+        id
       ])
       .andWhereNotIn('status', ['CANCELED', 'REJECTED', 'COMPLETED'])
       .andWhere('cycle', payload.cycle)
@@ -101,9 +105,15 @@ export default class EventsController {
 
     await findEventValidator.validate(payload)
 
+    const { id, churchId } = auth.user.$attributes
+
     const event = await Event.query()
       .where('id', payload.id)
-      .where('churchId', auth.user.$attributes.churchId)
+      .whereRaw('(church_id = ? OR (is_internal = ? AND created_by = ?))', [
+        churchId,
+        false,
+        id
+      ])
       .preload('author')
       .preload('maintainer')
       .first()
@@ -111,6 +121,58 @@ export default class EventsController {
     if (!event) {
       throw new PermissionDeniedException('', 401, 'E_PERMISSION_DENIED')
     }
+
+    return response.status(200).json({ event })
+  }
+
+  public async update({ auth, request, response }: HttpContextContract) {
+    const payload = { ...request.params(), ...request.body() }
+
+    await updateEventValidator.validate(payload)
+
+    const { id, churchId } = auth.user.$attributes
+
+    const event = await Event.query()
+      .where('id', payload.id)
+      .whereRaw('(church_id = ? OR (is_internal = ? AND created_by = ?))', [
+        churchId,
+        false,
+        id
+      ])
+      .first()
+
+    if (!event) {
+      throw new PermissionDeniedException('', 401, 'E_PERMISSION_DENIED')
+    }
+
+    await event
+      .merge({
+        churchId: payload.isInternal ? churchId : null,
+        title: payload.title,
+        description: payload.description,
+        objective: payload.objective,
+        voiceOverSuggestions: payload.voiceOverSuggestions,
+        contactDetails: payload.contactDetails,
+        date: payload.date,
+        location: payload.location,
+        isInternal: payload.isInternal,
+        department: payload.department,
+        cycle: (() => {
+          const currentDate = new Date()
+          const currentWeekDay = currentDate.getDay() + 1
+
+          if (
+            currentWeekDay > Number(Env.get('EVENT_MAX_SUBMISSION_WEEK_DAY'))
+          ) {
+            return this.getCycle(currentDate, 1).cycle
+          }
+
+          return this.getCycle(currentDate).cycle
+        })(),
+        createdBy: id,
+        updatedBy: id
+      })
+      .save()
 
     return response.status(200).json({ event })
   }

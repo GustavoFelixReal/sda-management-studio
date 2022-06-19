@@ -34,3 +34,18 @@ export const cycleListValidator = yup.object().shape({
 export const findEventValidator = yup.object().shape({
   id: yup.string().required('validation.event_id_required')
 })
+
+export const updateEventValidator = yup.object().shape({
+  id: yup.string().required('validation.event_id_required'),
+  title: yup.string().required('validation.event_title_required'),
+  description: yup.string().required('validation.event_description_required'),
+  objective: yup.string().required('validation.event_objective_required'),
+  voiceOverSuggestions: yup.string().max(300),
+  contactDetails: yup.string().max(300),
+  date: yup.date().required('validation.event_date_required'),
+  location: yup.string().required('validation.event_location_required'),
+  department: yup
+    .string()
+    .required('validation.event_department_required')
+    .oneOf(Church.departments, 'validation.invalid_department')
+})
