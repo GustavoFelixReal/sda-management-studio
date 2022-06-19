@@ -23,6 +23,7 @@ export default class EventsController {
         query.select('id', 'url', 'description')
       })
       .where('churchId', auth.user.$attributes.churchId)
+      .orWhere('isInternal', false)
 
     return response.status(200).json({ events })
   }
@@ -46,16 +47,7 @@ export default class EventsController {
       isInternal: payload.isInternal,
       department: payload.department,
       status: 'PENDING',
-      cycle: (() => {
-        const currentDate = new Date()
-        const currentWeekDay = currentDate.getDay() + 1
-
-        if (currentWeekDay > Number(Env.get('EVENT_MAX_SUBMISSION_WEEK_DAY'))) {
-          return this.getCycle(currentDate, 1).cycle
-        }
-
-        return this.getCycle(currentDate).cycle
-      })(),
+      cycle: this.setCycle(),
       createdBy: id,
       updatedBy: id
     })
@@ -157,24 +149,24 @@ export default class EventsController {
         location: payload.location,
         isInternal: payload.isInternal,
         department: payload.department,
-        cycle: (() => {
-          const currentDate = new Date()
-          const currentWeekDay = currentDate.getDay() + 1
-
-          if (
-            currentWeekDay > Number(Env.get('EVENT_MAX_SUBMISSION_WEEK_DAY'))
-          ) {
-            return this.getCycle(currentDate, 1).cycle
-          }
-
-          return this.getCycle(currentDate).cycle
-        })(),
+        cycle: this.setCycle(),
         createdBy: id,
         updatedBy: id
       })
       .save()
 
     return response.status(200).json({ event })
+  }
+
+  private setCycle() {
+    const currentDate = new Date()
+    const currentWeekDay = currentDate.getDay() + 1
+
+    if (currentWeekDay > Number(Env.get('EVENT_MAX_SUBMISSION_WEEK_DAY'))) {
+      return this.getCycle(currentDate, 1).cycle
+    }
+
+    return this.getCycle(currentDate).cycle
   }
 
   private getCycle(
