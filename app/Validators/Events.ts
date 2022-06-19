@@ -1,4 +1,5 @@
 import Church from 'App/Models/Church'
+import Event from 'App/Models/Event'
 import * as yup from 'yup'
 
 export const createEventValidator = yup.object().shape({
@@ -48,4 +49,12 @@ export const updateEventValidator = yup.object().shape({
     .string()
     .required('validation.event_department_required')
     .oneOf(Church.departments, 'validation.invalid_department')
+})
+
+export const changeStatusEventValidator = yup.object().shape({
+  id: yup.string().required('validation.event_id_required'),
+  status: yup
+    .string()
+    .required('validation.event_status_required')
+    .oneOf(Event.allStatus, 'validation.invalid_status')
 })

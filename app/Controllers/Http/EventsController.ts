@@ -2,6 +2,7 @@ import Env from '@ioc:Adonis/Core/Env'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 import {
+  changeStatusEventValidator,
   createEventValidator,
   cycleListValidator,
   findEventValidator,
@@ -154,6 +155,32 @@ export default class EventsController {
         updatedBy: id
       })
       .save()
+
+    return response.status(200).json({ event })
+  }
+
+  public async changeStatus({ auth, request, response }: HttpContextContract) {
+    const payload = { ...request.body(), ...request.params() }
+
+    await changeStatusEventValidator.validate(payload)
+
+    const { id: eventId, status } = payload
+    const { id, churchId } = auth.user.$attributes
+
+    const event = await Event.query()
+      .where('id', eventId)
+      .whereRaw('(church_id = ? OR (is_internal = ? AND created_by = ?))', [
+        churchId,
+        false,
+        id
+      ])
+      .first()
+
+    if (!event) {
+      throw new PermissionDeniedException('', 401, 'E_PERMISSION_DENIED')
+    }
+
+    await event.merge({ status }).save()
 
     return response.status(200).json({ event })
   }
