@@ -1,6 +1,8 @@
 import Env from '@ioc:Adonis/Core/Env'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
+import Calendar from '@ioc:Calendar'
+
 import {
   changeStatusEventValidator,
   createEventValidator,
@@ -9,13 +11,17 @@ import {
   updateEventValidator
 } from 'App/Validators/Events'
 
+import { inject } from '@adonisjs/core/build/standalone'
 import PermissionDeniedException from 'App/Exceptions/PermissionDeniedException'
 import Event from 'App/Models/Event'
 import EventImage from 'App/Models/EventImage'
 import EventLink from 'App/Models/EventLink'
 
+@inject()
 export default class EventsController {
   public async index({ auth, response }: HttpContextContract) {
+    const calendarEvents = await Calendar.getEvents()
+
     const events = await Event.query()
       .preload('images', (query) => {
         query.select('id', 'src', 'description')
@@ -26,7 +32,7 @@ export default class EventsController {
       .where('churchId', auth.user.$attributes.churchId)
       .orWhere('isInternal', false)
 
-    return response.status(200).json({ events })
+    return response.status(200).json({ events, calendarEvents })
   }
 
   public async store({ auth, request, response }: HttpContextContract) {

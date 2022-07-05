@@ -1,12 +1,14 @@
 import { ApplicationContract } from '@ioc:Adonis/Core/Application'
 
-export default class AppProvider {
-  public calendar
-
+export default class CalendarProvider {
   constructor(protected app: ApplicationContract) {}
 
   public register() {
-    // Register your own bindings
+    this.app.container.singleton('Calendar', () => {
+      const Calendar = require('./calendar').default
+
+      return new Calendar()
+    })
   }
 
   public async boot() {
