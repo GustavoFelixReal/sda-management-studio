@@ -1,4 +1,5 @@
 import {
+  beforeCreate,
   BelongsTo,
   belongsTo,
   column,
@@ -6,6 +7,7 @@ import {
   hasMany
 } from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon'
+import { v4 as uuidv4 } from 'uuid'
 
 import AppBaseModel from './AppBaseModel'
 import Church from './Church'
@@ -18,12 +20,14 @@ export default class Event extends AppBaseModel {
     'PENDING',
     'APPROVED',
     'REJECTED',
-    'CANCELED',
-    'COMPLETED'
+    'CANCELED'
   ]
 
   @column({ isPrimary: true })
   public id: number
+
+  @column()
+  public calendarEventId: string
 
   @column()
   public churchId: number
@@ -44,16 +48,25 @@ export default class Event extends AppBaseModel {
   public contactDetails: string
 
   @column()
-  public date: DateTime
+  public startDate: DateTime
+
+  @column()
+  public endDate: DateTime
 
   @column()
   public isRecurrent: boolean
+
+  @column()
+  public recurrencyRule: string
 
   @column()
   public location: string
 
   @column()
   public isInternal: boolean
+
+  @column()
+  public isPublic: boolean
 
   @column()
   public department: string
@@ -75,6 +88,11 @@ export default class Event extends AppBaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @beforeCreate()
+  public static async generateCalendarEventId(event: Event) {
+    event.calendarEventId = uuidv4()
+  }
 
   @belongsTo(() => Church, {
     foreignKey: 'churchId'

@@ -1,6 +1,6 @@
 declare module '@ioc:Adonis/Core/Chain' {
   interface Chain {
     handle: (...args: any[]) => any
-    next: () => void
+    next: (...args: any[]) => void
   }
 }

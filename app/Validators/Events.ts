@@ -8,7 +8,8 @@ export const createEventValidator = yup.object().shape({
   objective: yup.string().required('validation.event_objective_required'),
   voiceOverSuggestions: yup.string().max(300),
   contactDetails: yup.string().max(300),
-  date: yup.date().required('validation.event_date_required'),
+  startDate: yup.date().required('validation.event_start_date_required'),
+  endDate: yup.date().required('validation.event_end_date_required'),
   location: yup.string().required('validation.event_location_required'),
   department: yup
     .string()
@@ -43,7 +44,8 @@ export const updateEventValidator = yup.object().shape({
   objective: yup.string().required('validation.event_objective_required'),
   voiceOverSuggestions: yup.string().max(300),
   contactDetails: yup.string().max(300),
-  date: yup.date().required('validation.event_date_required'),
+  startDate: yup.date().required('validation.event_start_date_required'),
+  endDate: yup.date().required('validation.event_end_date_required'),
   location: yup.string().required('validation.event_location_required'),
   department: yup
     .string()

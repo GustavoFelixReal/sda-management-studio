@@ -14,7 +14,8 @@ export default class Church extends AppBaseModel {
   public static departments: string[] = [
     'LAR E FAMÍLIA',
     'DESBRAVADORES',
-    'COMUNICAÇÃO'
+    'COMUNICAÇÃO',
+    'JOVENS'
   ]
 
   @column({ isPrimary: true })

@@ -49,6 +49,7 @@ Route.group(() => {
   Route.get('/events/cycle/:cycle', 'EventsController.cycleList')
   Route.get('/events/:id', 'EventsController.find')
   Route.put('/events/:id', 'EventsController.update')
+  Route.put('/events/:id/change_status', 'EventsController.changeStatus')
 }).middleware('auth')
 
 // Schedules

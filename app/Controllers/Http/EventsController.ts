@@ -1,8 +1,6 @@
 import Env from '@ioc:Adonis/Core/Env'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-import Calendar from '@ioc:Calendar'
-
 import {
   changeStatusEventValidator,
   createEventValidator,
@@ -11,17 +9,14 @@ import {
   updateEventValidator
 } from 'App/Validators/Events'
 
-import { inject } from '@adonisjs/core/build/standalone'
+import EventApproved from 'App/Chains/EventStatus/EventApproved'
 import PermissionDeniedException from 'App/Exceptions/PermissionDeniedException'
 import Event from 'App/Models/Event'
 import EventImage from 'App/Models/EventImage'
 import EventLink from 'App/Models/EventLink'
 
-@inject()
 export default class EventsController {
   public async index({ auth, response }: HttpContextContract) {
-    const calendarEvents = await Calendar.getEvents()
-
     const events = await Event.query()
       .preload('images', (query) => {
         query.select('id', 'src', 'description')
@@ -32,7 +27,7 @@ export default class EventsController {
       .where('churchId', auth.user.$attributes.churchId)
       .orWhere('isInternal', false)
 
-    return response.status(200).json({ events, calendarEvents })
+    return response.status(200).json({ events })
   }
 
   public async store({ auth, request, response }: HttpContextContract) {
@@ -49,7 +44,8 @@ export default class EventsController {
       objective: payload.objective,
       voiceOverSuggestions: payload.voiceOverSuggestions,
       contactDetails: payload.contactDetails,
-      date: payload.date,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
       location: payload.location,
       isInternal: payload.isInternal,
       department: payload.department,
@@ -152,7 +148,8 @@ export default class EventsController {
         objective: payload.objective,
         voiceOverSuggestions: payload.voiceOverSuggestions,
         contactDetails: payload.contactDetails,
-        date: payload.date,
+        startDate: payload.startDate,
+        endDate: payload.endDate,
         location: payload.location,
         isInternal: payload.isInternal,
         department: payload.department,
@@ -173,7 +170,7 @@ export default class EventsController {
     const { id: eventId, status } = payload
     const { id, churchId } = auth.user.$attributes
 
-    const event = await Event.query()
+    let event = await Event.query()
       .where('id', eventId)
       .whereRaw('(church_id = ? OR (is_internal = ? AND created_by = ?))', [
         churchId,
@@ -186,7 +183,9 @@ export default class EventsController {
       throw new PermissionDeniedException('', 401, 'E_PERMISSION_DENIED')
     }
 
-    await event.merge({ status }).save()
+    event = await event.merge({ status }).save()
+
+    await new EventApproved().next(event)
 
     return response.status(200).json({ event })
   }

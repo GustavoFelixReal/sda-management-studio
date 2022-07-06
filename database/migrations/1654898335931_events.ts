@@ -6,6 +6,7 @@ export default class Events extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.bigIncrements('id')
+      table.string('calendar_event_id')
       table
         .bigInteger('church_id')
         .unsigned()
@@ -16,10 +17,13 @@ export default class Events extends BaseSchema {
       table.text('objective').notNullable()
       table.string('voice_over_suggestions', 300)
       table.string('contact_details', 300)
-      table.dateTime('date').notNullable()
+      table.dateTime('start_date').notNullable()
+      table.dateTime('end_date').notNullable()
       table.boolean('is_recurrent').defaultTo(false)
+      table.string('recurrency_rule')
       table.string('location', 300).notNullable()
       table.boolean('is_internal').defaultTo(true)
+      table.boolean('is_public').defaultTo(true)
       table.string('department').notNullable()
       table.string('status', 50).defaultTo('PENDING')
       table.string('cycle', 6)
