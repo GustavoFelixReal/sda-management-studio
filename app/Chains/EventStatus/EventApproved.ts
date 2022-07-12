@@ -11,30 +11,38 @@ export default class EventApproved implements Chain {
     if (event.status === 'APPROVED') {
       const { timeZone } = Intl.DateTimeFormat().resolvedOptions()
 
-      console.log(event)
+      const id = event.calendarEventId.replaceAll('-', '')
+      const startDate = new Date(event.startDate.toString()).toISOString()
+      const endDate = new Date(event.endDate.toString()).toISOString()
 
-      await Calendar.createEvent({
-        id: event.calendarEventId,
-        anyoneCanAddSelf: true,
-        status: 'confirmed',
-        summary: event.title,
-        location: event.location,
-        description: event.description,
-        start: {
-          dateTime: event.startDate.toString(),
-          timeZone
-        },
-        end: {
-          dateTime: event.endDate.toString(),
-          timeZone
-        }
-      })
+      try {
+        await Calendar.createEvent({
+          id,
+          anyoneCanAddSelf: true,
+          status: 'confirmed',
+          summary: event.title,
+          location: event.location,
+          description: event.description,
+          start: {
+            dateTime: startDate,
+            timeZone
+          },
+          end: {
+            dateTime: endDate,
+            timeZone
+          }
+        })
+      } catch {
+        return false
+      }
     }
   }
 
   public async next(event: Event) {
-    this.handle(event)
+    if ((await this.handle(event)) !== false) {
+      return await new EventCancelled().next(event)
+    }
 
-    new EventCancelled().next(event)
+    return false
   }
 }

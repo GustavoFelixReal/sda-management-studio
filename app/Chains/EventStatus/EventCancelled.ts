@@ -8,9 +8,11 @@ export default class EventCancelled implements Chain {
     if (event.status === 'CANCELLED') {
       await Calendar.changeEventStatus(event.calendarEventId, 'cancelled')
     }
+
+    return true
   }
 
   public async next(event: Event) {
-    this.handle(event)
+    return this.handle(event)
   }
 }

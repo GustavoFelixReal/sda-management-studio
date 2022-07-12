@@ -10,6 +10,7 @@ import {
 } from 'App/Validators/Events'
 
 import EventApproved from 'App/Chains/EventStatus/EventApproved'
+import GoogleAPIException from 'App/Exceptions/GoogleApiException'
 import PermissionDeniedException from 'App/Exceptions/PermissionDeniedException'
 import Event from 'App/Models/Event'
 import EventImage from 'App/Models/EventImage'
@@ -185,7 +186,9 @@ export default class EventsController {
 
     event = await event.merge({ status }).save()
 
-    await new EventApproved().next(event)
+    if (!(await new EventApproved().next(event))) {
+      throw new GoogleAPIException('', 400, 'E_GOOGLE_API_ERROR')
+    }
 
     return response.status(200).json({ event })
   }

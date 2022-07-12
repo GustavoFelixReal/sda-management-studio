@@ -13,11 +13,11 @@
 |
 */
 
-import Logger from '@ioc:Adonis/Core/Logger'
 import HttpExceptionHandler from '@ioc:Adonis/Core/HttpExceptionHandler'
+import Logger from '@ioc:Adonis/Core/Logger'
 
-import { ValidationError } from 'yup'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { ValidationError } from 'yup'
 
 export default class ExceptionHandler extends HttpExceptionHandler {
   constructor() {
@@ -70,6 +70,18 @@ export default class ExceptionHandler extends HttpExceptionHandler {
             code: 'permission_denied',
             status: 401,
             message: 'request.permission_denied'
+          }
+        ]
+      })
+    }
+
+    if (error.code === 'E_GOOGLE_API_ERROR') {
+      return ctx.response.status(500).json({
+        errors: [
+          {
+            code: 'calendar_service_error',
+            status: 500,
+            message: 'request.calendar_service_error'
           }
         ]
       })

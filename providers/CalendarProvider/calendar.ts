@@ -42,6 +42,8 @@ export default class Calendar {
     })
   }
 
+  public async getEvent(eventId: string) {}
+
   public async getEvents() {
     const events = await this.calendar.events.list({
       calendarId: Env.get('GOOGLE_CALENDAR_ID')
@@ -52,7 +54,6 @@ export default class Calendar {
 
   public async createEvent(event: CalendarEvent) {
     await this.calendar.events.insert({
-      auth: this.auth,
       calendarId: Env.get('GOOGLE_CALENDAR_ID'),
       requestBody: {
         ...event
